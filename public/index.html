@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PKI Simulator — интерактивный симулятор инфраструктуры открытых ключей. Генерация ключей RSA, создание сертификатов, электронная подпись и проверка.">
+  <title>PKI Simulator — Инфраструктура открытых ключей</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header__inner">
+      <div class="header__logo">
+        <div class="header__logo-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="url(#logo-grad)"/>
+            <path d="M16 7L10 11v4c0 5.55 2.56 10.74 6 13 3.44-2.26 6-7.45 6-13v-4l-6-4z" fill="white" opacity="0.9"/>
+            <path d="M16 13a2 2 0 100 4 2 2 0 000-4zm0 5c-1.1 0-2 .9-2 2v2h4v-2c0-1.1-.9-2-2-2z" fill="url(#logo-grad)"/>
+            <defs>
+              <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32">
+                <stop stop-color="#6366f1"/>
+                <stop offset="1" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="header__title">PKI Simulator</span>
+      </div>
+      <p class="header__subtitle">Инфраструктура открытых ключей</p>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="hero__bg"></div>
+    <div class="hero__content">
+      <h1 class="hero__title">Интерактивный симулятор<br><span class="hero__highlight">PKI</span></h1>
+      <p class="hero__desc">Изучите принципы работы инфраструктуры открытых ключей: генерация RSA-ключей, создание сертификатов, электронная подпись и проверка — всё в браузере.</p>
+      <div class="hero__stats">
+        <div class="hero__stat">
+          <span class="hero__stat-icon">🔑</span>
+          <span class="hero__stat-label">RSA Key Pair</span>
+        </div>
+        <div class="hero__stat">
+          <span class="hero__stat-icon">📜</span>
+          <span class="hero__stat-label">X.509 Certificates</span>
+        </div>
+        <div class="hero__stat">
+          <span class="hero__stat-icon">✍️</span>
+          <span class="hero__stat-label">Digital Signatures</span>
+        </div>
+        <div class="hero__stat">
+          <span class="hero__stat-icon">🛡️</span>
+          <span class="hero__stat-label">CRL Revocation</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== NAVIGATION TABS ===== -->
+  <nav class="tabs" id="nav-tabs">
+    <button class="tabs__btn tabs__btn--active" data-section="section-register">
+      <span class="tabs__icon">👤</span> Регистрация (RA)
+    </button>
+    <button class="tabs__btn" data-section="section-keys">
+      <span class="tabs__icon">🔐</span> Генерация ключей
+    </button>
+    <button class="tabs__btn" data-section="section-certs">
+      <span class="tabs__icon">📜</span> Сертификаты (CA)
+    </button>
+    <button class="tabs__btn" data-section="section-sign">
+      <span class="tabs__icon">✍️</span> Подпись
+    </button>
+    <button class="tabs__btn" data-section="section-verify">
+      <span class="tabs__icon">✅</span> Проверка
+    </button>
+  </nav>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main">
+
+    <!-- ========== SECTION: REGISTRATION (RA) ========== -->
+    <section class="section section--active" id="section-register">
+      <div class="card">
+        <div class="card__header">
+          <div class="card__icon">👤</div>
+          <div>
+            <h2 class="card__title">Регистрация пользователя</h2>
+            <p class="card__subtitle">Registration Authority (RA)</p>
+          </div>
+        </div>
+        <p class="card__desc">Центр регистрации (RA) выполняет проверку личности пользователя перед выдачей сертификата. Введите данные пользователя для регистрации в системе PKI.</p>
+        <form id="form-register" class="form">
+          <div class="form__group">
+            <label class="form__label" for="reg-name">Имя пользователя</label>
+            <input class="form__input" type="text" id="reg-name" placeholder="Например: Иван Иванов" required>
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="reg-email">Email</label>
+            <input class="form__input" type="email" id="reg-email" placeholder="ivan@example.com" required>
+          </div>
+          <button class="btn btn--primary" type="submit" id="btn-register">
+            <span class="btn__icon">📝</span> Зарегистрировать
+          </button>
+        </form>
+        <div class="result" id="result-register" style="display:none"></div>
+      </div>
+
+      <!-- Список зарегистрированных пользователей -->
+      <div class="card">
+        <div class="card__header">
+          <div class="card__icon">📋</div>
+          <div>
+            <h2 class="card__title">Зарегистрированные пользователи</h2>
+            <p class="card__subtitle">Список пользователей в системе</p>
+          </div>
+        </div>
+        <div id="users-list" class="list-container">
+          <p class="list-empty">Нет зарегистрированных пользователей</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SECTION: KEY GENERATION ========== -->
+    <section class="section" id="section-keys">
+      <div class="card">
+        <div class="card__header">
+          <div class="card__icon">🔐</div>
+          <div>
+            <h2 class="card__title">Генерация RSA-ключей</h2>
+            <p class="card__subtitle">Web Crypto API — RSA-OAEP / RSASSA-PKCS1-v1_5</p>
+          </div>
+        </div>
+        <p class="card__desc">Генерация пары ключей RSA (2048 бит) выполняется <strong>в браузере</strong> с помощью Web Crypto API. Закрытый ключ никогда не покидает клиент.</p>
+        <button class="btn btn--primary" id="btn-generate-keys">
+          <span class="btn__icon">⚡</span> Сгенерировать ключи RSA
+        </button>
+        <div class="result" id="result-keys" style="display:none"></div>
+
+        <!-- Отображение ключей -->
+        <div id="keys-display" style="display:none">
+          <div class="key-block">
+            <h3 class="key-block__title">
+              <span class="key-block__icon key-block__icon--public">🔓</span> Public Key (открытый ключ)
+            </h3>
+            <textarea class="key-block__textarea" id="public-key-display" readonly rows="6"></textarea>
+            <button class="btn btn--secondary btn--sm" onclick="copyToClipboard('public-key-display')">📋 Копировать</button>
+          </div>
+          <div class="key-block">
+            <h3 class="key-block__title">
+              <span class="key-block__icon key-block__icon--private">🔒</span> Private Key (закрытый ключ)
+            </h3>
+            <textarea class="key-block__textarea key-block__textarea--private" id="private-key-display" readonly rows="6"></textarea>
+            <button class="btn btn--secondary btn--sm" onclick="copyToClipboard('private-key-display')">📋 Копировать</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SECTION: CERTIFICATES (CA) ========== -->
+    <section class="section" id="section-certs">
+      <div class="card">
+        <div class="card__header">
+          <div class="card__icon">📜</div>
+          <div>
+            <h2 class="card__title">Центр сертификации (CA)</h2>
+            <p class="card__subtitle">Certificate Authority</p>
+          </div>
+        </div>
+        <p class="card__desc">Центр сертификации (CA) выпускает цифровые сертификаты, связывая открытый ключ с идентичностью владельца. Выберите пользователя и предоставьте открытый ключ для создания сертификата.</p>
+        <form id="form-certificate" class="form">
+          <div class="form__group">
+            <label class="form__label" for="cert-user">Пользователь</label>
+            <select class="form__input form__select" id="cert-user" required>
+              <option value="">— Выберите пользователя —</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="cert-pubkey">Public Key (PEM)</label>
+            <textarea class="form__textarea" id="cert-pubkey" rows="4" placeholder="Вставьте открытый ключ (PEM)" required></textarea>
+            <button type="button" class="btn btn--secondary btn--sm" id="btn-paste-pubkey">📋 Вставить текущий ключ</button>
+          </div>
+          <div class="form__row">
+            <div class="form__group">
+              <label class="form__label" for="cert-validity">Срок действия (дни)</label>
+              <input class="form__input" type="number" id="cert-validity" value="365" min="1" max="3650">
+            </div>
+          </div>
+          <button class="btn btn--primary" type="submit" id="btn-create-cert">
+            <span class="btn__icon">🏛️</span> Выпустить сертификат
+          </button>
+        </form>
+        <div class="result" id="result-cert" style="display:none"></div>
+      </div>
+
+      <!-- Список сертификатов -->
+      <div class="card">
+        <div class="card__header">
+          <div class="card__icon">📑</div>
+          <div>
+            <h2 class="card__title">Выпущенные сертификаты</h2>
+            <p class="card__subtitle">Certificate Repository</p>
+          </div>
+        </div>
+        <button class="btn btn--secondary" id="btn-load-certs" style="margin-bottom: 1rem;">
+          🔄 Обновить список
+        </button>
+        <div id="certs-list" class="list-container">
+          <p class="list-empty">Нет выпущенных сертификатов</p>
+        </div>
+      </div>
+
+      <!-- Проверка сертификата -->
+      <div class="card">
+        <div class="card__header">
+          <div class="card__icon">🔍</div>
+          <div>
+            <h2 class="card__title">Проверка сертификата</h2>
+            <p class="card__subtitle">Certificate Validation</p>
+          </div>
+        </div>
+        <form id="form-check-cert" class="form">
+          <div class="form__group">
+            <label class="form__label" for="check-cert-id">ID сертификата</label>
+            <input class="form__input" type="text" id="check-cert-id" placeholder="Введите ID сертификата" required>
+          </div>
+          <button class="btn btn--primary" type="submit">
+            <span class="btn__icon">🔍</span> Проверить
+          </button>
+        </form>
+        <div class="result" id="result-check-cert" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- ========== SECTION: SIGN MESSAGE ========== -->
+    <section class="section" id="section-sign">
+      <div class="card">
+        <div class="card__header">
+          <div class="card__icon">✍️</div>
+          <div>
+            <h2 class="card__title">Электронная подпись</h2>
+            <p class="card__subtitle">Digital Signature (RSASSA-PKCS1-v1_5)</p>
+          </div>
+        </div>
+        <p class="card__desc">Подпишите сообщение с помощью закрытого ключа. Подпись создаётся алгоритмом RSASSA-PKCS1-v1_5 с хешем SHA-256 прямо в браузере.</p>
+        <form id="form-sign" class="form">
+          <div class="form__group">
+            <label class="form__label" for="sign-message">Сообщение для подписи</label>
+            <textarea class="form__textarea" id="sign-message" rows="4" placeholder="Введите текст сообщения..." required></textarea>
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="sign-privkey">Private Key (PEM)</label>
+            <textarea class="form__textarea" id="sign-privkey" rows="4" placeholder="Вставьте закрытый ключ (PEM)" required></textarea>
+            <button type="button" class="btn btn--secondary btn--sm" id="btn-paste-privkey">📋 Вставить текущий ключ</button>
+          </div>
+          <button class="btn btn--primary" type="submit" id="btn-sign">
+            <span class="btn__icon">✍️</span> Подписать
+          </button>
+        </form>
+        <div class="result" id="result-sign" style="display:none"></div>
+        <div id="signature-display" style="display:none">
+          <div class="key-block">
+            <h3 class="key-block__title">
+              <span class="key-block__icon key-block__icon--sign">🖊️</span> Цифровая подпись (Base64)
+            </h3>
+            <textarea class="key-block__textarea" id="signature-output" readonly rows="4"></textarea>
+            <button class="btn btn--secondary btn--sm" onclick="copyToClipboard('signature-output')">📋 Копировать</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SECTION: VERIFY SIGNATURE ========== -->
+    <section class="section" id="section-verify">
+      <div class="card">
+        <div class="card__header">
+          <div class="card__icon">✅</div>
+          <div>
+            <h2 class="card__title">Проверка подписи</h2>
+            <p class="card__subtitle">Signature Verification</p>
+          </div>
+        </div>
+        <p class="card__desc">Проверьте подлинность подписи с помощью открытого ключа подписавшего. Верификация выполняется в браузере через Web Crypto API.</p>
+        <form id="form-verify" class="form">
+          <div class="form__group">
+            <label class="form__label" for="verify-message">Оригинальное сообщение</label>
+            <textarea class="form__textarea" id="verify-message" rows="3" placeholder="Введите оригинальный текст..." required></textarea>
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="verify-signature">Подпись (Base64)</label>
+            <textarea class="form__textarea" id="verify-signature" rows="3" placeholder="Вставьте цифровую подпись..." required></textarea>
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="verify-pubkey">Public Key (PEM)</label>
+            <textarea class="form__textarea" id="verify-pubkey" rows="4" placeholder="Вставьте открытый ключ (PEM)" required></textarea>
+            <button type="button" class="btn btn--secondary btn--sm" id="btn-paste-pubkey-verify">📋 Вставить текущий ключ</button>
+          </div>
+          <button class="btn btn--primary" type="submit" id="btn-verify">
+            <span class="btn__icon">🔍</span> Проверить подпись
+          </button>
+        </form>
+        <div class="result" id="result-verify" style="display:none"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <p>PKI Simulator — индивидуальный проект</p>
+    <p class="footer__sub">Инфраструктура открытых ключей и её основные функции</p>
+  </footer>
+
+  <!-- ===== TOAST NOTIFICATION ===== -->
+  <div id="toast" class="toast" style="display:none"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
